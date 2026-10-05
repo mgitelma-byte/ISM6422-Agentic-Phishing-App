@@ -1,7 +1,7 @@
 import asyncio
 import json
 import os
-from concurrent.futures import ThreadPoolExecutor
+import threading
 
 import pandas as pd
 import streamlit as st
@@ -190,16 +190,25 @@ def train_classifier():
     return classifier
 
 
-def run_async(coroutine):
-    """Run an Agents SDK coroutine safely from Streamlit."""
-    try:
-        asyncio.get_running_loop()
-    except RuntimeError:
-        return asyncio.run(coroutine)
+@st.cache_resource(show_spinner=False)
+def get_agent_event_loop():
+    """Keep one asyncio event loop alive for the lifetime of the Streamlit app."""
+    loop = asyncio.new_event_loop()
 
-    # Fallback if Streamlit is ever running inside an existing event loop.
-    with ThreadPoolExecutor(max_workers=1) as pool:
-        return pool.submit(lambda: asyncio.run(coroutine)).result()
+    def run_loop():
+        asyncio.set_event_loop(loop)
+        loop.run_forever()
+
+    thread = threading.Thread(target=run_loop, daemon=True)
+    thread.start()
+    return loop
+
+
+def run_async(coroutine):
+    """Run all Agents SDK async work on the same persistent event loop."""
+    loop = get_agent_event_loop()
+    future = asyncio.run_coroutine_threadsafe(coroutine, loop)
+    return future.result()
 
 
 def build_agent_system(api_key, phishing_model):
