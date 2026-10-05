@@ -275,7 +275,11 @@ def build_agent_system(api_key, phishing_model):
             return "Mock quarantine blocked: email_id is required."
         if not reason.strip():
             return "Mock quarantine blocked: a reason is required."
-        return f"Mock quarantine confirmed for {email_id}. Reason: {reason}"
+       return (
+    f"SIMULATED quarantine completed for {email_id}. "
+    f"This is a classroom demonstration only and does not affect a real email system. "
+    f"Reason: {reason}"
+)
 
     triage_agent = Agent(
         name="Phishing Triage Assistant",
@@ -298,7 +302,11 @@ def build_agent_system(api_key, phishing_model):
         "If the user explicitly asks to quarantine or take action, classify first and obtain security_review before deciding whether to call quarantine_email. "
         "Call quarantine_email only when the user explicitly requested quarantine/action and the evidence supports quarantine. "
         "Do not quarantine an email that the evidence indicates is legitimate. "
-        "The quarantine tool requires human approval. If approval is rejected, do not claim the email was quarantined. "
+        "The quarantine tool requires human approval. "
+"If approval is rejected, do not claim the email was quarantined. "
+"If approval is granted, clearly state that the quarantine is SIMULATED for a classroom demonstration "
+"and does not affect or interact with any real email system. "
+"Never claim that a real email was isolated, blocked, deleted, or prevented from delivery. "
         "Use the email ID supplied by the user; if none is supplied, use DEMO-001. "
         "Consolidate the tool results into one concise answer and clearly state the ML classification, probability, specialist recommendation when used, "
         "and whether an action is pending approval, completed, or not appropriate."
