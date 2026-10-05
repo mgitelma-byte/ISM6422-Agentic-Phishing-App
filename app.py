@@ -275,7 +275,7 @@ def build_agent_system(api_key, phishing_model):
             return "Mock quarantine blocked: email_id is required."
         if not reason.strip():
             return "Mock quarantine blocked: a reason is required."
-       return (
+        return (
     f"SIMULATED quarantine completed for {email_id}. "
     f"This is a classroom demonstration only and does not affect a real email system. "
     f"Reason: {reason}"
